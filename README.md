@@ -57,3 +57,10 @@ locust --config from_apache.conf -H http://catalog.data.gov --csv=results
 
 This will iterate over all URLs and write several CSV file with stats and failures details.  
 
+## Run advanced test
+
+The advanced test uses the API call to look for real dataset, harvest sources, organization and groups before ping them.
+
+```
+locust --config advanced.conf -H http://catalog.data.gov --csv=results
+```
