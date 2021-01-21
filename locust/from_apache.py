@@ -1,5 +1,9 @@
 import re
 from locust import HttpUser, task, between
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def generate_url(apache_urls_path='results.txt'):
@@ -11,8 +15,7 @@ def generate_url(apache_urls_path='results.txt'):
 generator = generate_url()
 
 
-class AnonUser(HttpUser):
-    wait_time = between(0.1, 0.2)
+class RandomSampleUser(HttpUser):
 
     def get_name(self, next_url):
         if next_url.startswith('/organization'):
@@ -45,7 +48,7 @@ class AnonUser(HttpUser):
 
             match = compiled.match(next_url)
             if match is None:
-                # print('Not match for \n\t[{}]'.format(next_url))
+                logger.warn('Not match for \n\t[{}]'.format(next_url))
                 return
             else:
                 data = match.groupdict()
@@ -55,6 +58,6 @@ class AnonUser(HttpUser):
 
         if name is None:
             name = 'others'
-            # print('{} not recognized'.format(next_url))
+            logger.warn('{} not recognized'.format(next_url))
 
         self.client.get(next_url, name=name)

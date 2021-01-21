@@ -2,7 +2,6 @@ from locust import HttpUser, task, between
 
 
 class AnonUser(HttpUser):
-    wait_time = between(1, 2)
 
     @task
     def index(self):
