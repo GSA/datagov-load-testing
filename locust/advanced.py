@@ -74,7 +74,7 @@ class AnonApiUser(HttpUser):
         url = f'/dataset/{name}'
         self.client.get(url, name='dataset')
 
-    @task(DATASET_WEIGHT)
+    @task(API_PACKAGE_SHOW_WEIGHT)
     def package_show(self):
         name = choice(self.pending_datasets)
         url = f'/api/3/action/package_show?id={name}'
