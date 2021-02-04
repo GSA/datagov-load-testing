@@ -5,21 +5,22 @@ from locust import HttpUser, task
 
 logger = logging.getLogger(__name__)
 
-
 HOME_WEIGHT = 1777
-DATASET_WEIGHT = 43939
+DATASET_WEIGHT = 500
 DATASETS_WEIGHT = 405
+DATASET_SEARCH_WEIGHT = 900
 HARVEST_SOURCE_WEIGHT = 3193
 HARVEST_SOURCES_WEIGHT = 1
 ORGS_WEIGHT = 16
 ORG_WEIGHT = 2298
 GROUPS_WEIGHT = 5
 GROUP_WEIGHT = 1496
-API_PACKAGE_SEARCH_WEIGHT = 1273
+API_PACKAGE_SEARCH_WEIGHT = 2500
 API_PACKAGE_SHOW_WEIGHT = 1413
 API_ORG_LIST_WEIGHT = 1
 API_GROUP_LIST_WEIGHT = 1
 API_HARVEST_SOURCE_SEARCH_WEIGHT = 1
+STATIC_WEIGHT = 16000
 # ! RESOURCE_WEIGTH = 7177
 
 
@@ -49,8 +50,11 @@ class AnonApiUser(HttpUser):
     @task(API_PACKAGE_SEARCH_WEIGHT)
     def random_dataset(self):
 
-        start = randint(1, self.total_datasets)
-        url = f'/api/3/action/package_search?rows=100&start={start}'
+        # the random search is better to get more variety on dataset
+        # but expensible and not realistic
+        # start = randint(1, self.total_datasets)
+        # url = f'/api/3/action/package_search?rows=100&start={start}'
+        url = '/api/3/action/package_search'
         response = self.client.get(url, name='api-package-search')
         try:
             data = response.json()
@@ -74,17 +78,38 @@ class AnonApiUser(HttpUser):
         url = f'/dataset/{name}'
         self.client.get(url, name='dataset')
 
+    @task(DATASET_SEARCH_WEIGHT)
+    def datasets_search(self):
+        name = choice(self.pending_datasets)
+        search_query = name[:6]
+        url = f'/dataset/?q={search_query}&sort=views_recent+desc'
+        self.client.get(url, name='dataset_search')
+
     @task(API_PACKAGE_SHOW_WEIGHT)
     def package_show(self):
         name = choice(self.pending_datasets)
         url = f'/api/3/action/package_show?id={name}'
         self.client.get(url, name='api-package-show')
 
+    @task(STATIC_WEIGHT)
+    def static_files(self):
+        assets = [
+            '/fanstatic/css/main.min.css',
+            '/fanstatic/base/tracking.min.js',
+            '/fanstatic/vendor/jquery.min.js',
+            '/fanstatic/vendor/font-awesome/css/font-awesome.min.css',
+            '/base/images/icon-search-27x26.png'
+        ]
+        # TODO add statics from extensions from ./extras/ckanext-xx/statics.json
+        url = choice(assets)
+        self.client.get(url, name='static_assets')
+
     @task(API_HARVEST_SOURCE_SEARCH_WEIGHT)
     def random_harvest_sources(self, max_start=900):
 
-        start = randint(1, max_start)
-        url = f'/api/3/action/package_search?rows=100&start={start}&q=(type:harvest)&fq=+dataset_type:harvest'
+        # start = randint(1, max_start)
+        # url = f'/api/3/action/package_search?rows=100&start={start}&q=(type:harvest)&fq=+dataset_type:harvest'
+        url = '/api/3/action/package_search?q=(type:harvest)&fq=+dataset_type:harvest'
         response = self.client.get(url, name='api-package-search-harvest')
         try:
             data = response.json()
