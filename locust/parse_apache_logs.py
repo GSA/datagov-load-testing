@@ -59,9 +59,9 @@ def parse_file(apache_log_path, output_path='results.txt', limit=0):
         'harvests':
             {'regex': re.compile(r'(\/[A-Za-z_]+)?\/harvest(\/)?$'), 'total': 0},
         'api-pkg-search':
-            {'regex': re.compile(r'/api/(3)?/action/package_search.*'), 'total': 0},
+            {'regex': re.compile(r'/api(/3)?/action/package_search.*'), 'total': 0},
         'api-pkg-show':
-            {'regex': re.compile(r'/api/(3)?/action/package_show.*'), 'total': 0},
+            {'regex': re.compile(r'/api(/3)?/action/package_show.*'), 'total': 0},
         'api-search':
             {'regex': re.compile(r'/api/search.*'), 'total': 0},
         'organization':
