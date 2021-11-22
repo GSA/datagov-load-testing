@@ -142,7 +142,10 @@ class AnonApiUser(HttpUser):
             return None
         results = data.get('result', [])
         # pick just some organizations randmonly
-        random_results = sample(results, 5)
+        if len(results) < 5:
+            random_results = results
+        else:
+            random_results = sample(results, 5)
         for org in random_results:
             url = f'/organization/{org}'
             self.pending_organizations.append(url)
@@ -163,7 +166,10 @@ class AnonApiUser(HttpUser):
             return None
         results = data.get('result', [])
         # pick just some organizations randmonly
-        random_results = sample(results, 5)
+        if len(results) < 5:
+            random_results = results
+        else:
+            random_results = sample(results, 5)
         for group in random_results:
             url = f'/group/{group}'
             self.pending_groups.append(url)
