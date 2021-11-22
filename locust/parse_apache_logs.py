@@ -34,7 +34,7 @@ def process_line(data):
         if data['request_path'].startswith(ss):
             return None
 
-    if data['method'] != 'GET':
+    if data['method'] not in ['GET', 'POST']:
         return None
 
     return data
@@ -76,9 +76,17 @@ def parse_file(apache_log_path, output_path='results.txt', limit=0):
             {'regex': re.compile(r'(\/[A-Za-z_]+)?\/group\?(.*)'), 'total': 0},
         'groups':
             {'regex': re.compile(r'(\/[A-Za-z_]+)?\/group(\/)?$'), 'total': 0},
+        'status-show':
+            {'regex': re.compile(r'/api/action/status_show'), 'total': 0},
+        'tracking':
+            {'regex': re.compile(r'/\_tracking'), 'total': 0},
+        'csw':
+            {'regex': re.compile(r'/csw(-all)?\?[A-Za-z_&=]+'), 'total': 0},
         'home':
             {'regex': re.compile(r'(\/[A-Za-z_]+)?\/$'), 'total': 0},
     }
+
+    status_code = {}
 
     c = 0
     for line in f:
@@ -90,6 +98,11 @@ def parse_file(apache_log_path, output_path='results.txt', limit=0):
         if data is None:
             continue
         out.write(data['request_path'] + "\n")
+
+        if data['status_code'] not in status_code:
+            status_code[data['status_code']] = 1
+        else:
+            status_code[data['status_code']] += 1
 
         found = False
         for name in weigths:
@@ -110,6 +123,7 @@ def parse_file(apache_log_path, output_path='results.txt', limit=0):
     nf.close()
 
     print([{k: weigths[k]['total']} for k in weigths])
+    print(status_code)
 
 
 parser = argparse.ArgumentParser()
