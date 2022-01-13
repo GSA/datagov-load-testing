@@ -1,4 +1,8 @@
 __pycache__
+*.pyc
 *.csv
 *.txt
+ckan.access*.log
+*.tgz
+*.gz
 .vscode/

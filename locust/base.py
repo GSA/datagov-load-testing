@@ -18,3 +18,7 @@ class AnonUser(HttpUser):
     @task
     def groups(self):
         self.client.get('/group')
+
+    @task
+    def dataset(self):
+        self.client.get('/dataset')
